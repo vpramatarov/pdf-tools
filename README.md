@@ -47,10 +47,13 @@ The easiest way to run the application is using Docker, as it automatically inst
 Clone the repository and update the `.env` file (optional)
 
 **⚙️ Configuration**
+
+```plaintext
 Variable	            Description	                                Default
 PORT	                The HTTP port to bind to.	                8080
 MAX_FILE_UPLOAD_SIZE	Max upload size in Megabytes (MB).	        50
 CLEANUP_CRON_INTERVAL	How often (in minutes) to delete old files.	10
+```
 
 ### 3. Start
 
@@ -65,13 +68,16 @@ To shut down the project use: `docker compose down`
 You can use the tool via Command Line Interface (CLI) to process files in bulk.
 
 **CLI Flags**
+
+```plaintext
 Flag	Description	                                    Default	    Values
 - mode	Operation mode	                                `compress`	`compress`, `word`
 - level	Compression level (only for compress mode)	    `ebook`	    `screen`, `ebook`, `printer`, `extreme`
 - out	Output directory	                            uploads	    Any valid path
 - sort  Enable smart sorting for columns (word only)    `true`      `true`, `false`
+```
 
-`docker compose run --rm app go run cmd/cli/main.go [flags] <files>`
+Usage: `docker compose run --rm app go run cmd/cli/main.go [flags] <files>`
 
 **Examples**
 
