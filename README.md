@@ -22,6 +22,7 @@ The tool uses a multi-stage pipeline (Ghostscript → QPDF → Validation) to re
 ---
 
 ### 📂 Project Structure
+```plaintext
 .
 ├── cmd/
 │   ├── server/       # Entry point for the Web Server
@@ -33,6 +34,7 @@ The tool uses a multi-stage pipeline (Ghostscript → QPDF → Validation) to re
 ├── web/              # HTML Templates and Assets
 ├── test/             # Test files (e.g., newspaper.pdf)
 └── Dockerfile        # Multi-stage Docker build
+```
 
 ## 🐳 Getting Started (Docker Compose)
 
