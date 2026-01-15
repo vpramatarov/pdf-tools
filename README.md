@@ -70,7 +70,7 @@ You can use the tool via Command Line Interface (CLI) to process files in bulk.
 **CLI Flags**
 
 ```plaintext
-Flag	Description	                                    Default	    Values
+**Flag**	**Description**	                                    **Default**	    **Values**
 - mode	Operation mode	                                `compress`	`compress`, `word`
 - level	Compression level (only for compress mode)	    `ebook`	    `screen`, `ebook`, `printer`, `extreme`
 - out	Output directory	                            uploads	    Any valid path
