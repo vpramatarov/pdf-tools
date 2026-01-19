@@ -97,4 +97,4 @@ Usage: `docker compose run --rm app go run cmd/cli/main.go [flags] <files>`
 
 ### 4. 🧪 Running Tests
 
-To run tests: `docker compose run --rm app go test ./... -v`
+To run tests: `docker compose run --rm app go test ./... -v` or if the container is already built `docker compose exec app go test ./... -v`
