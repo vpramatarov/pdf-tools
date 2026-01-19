@@ -1,0 +1,15 @@
+services:
+  app:
+    build:
+      context: .
+      target: dev # dev stage for hot reloading
+    ports:
+      - "${PORT:-8080}:${PORT:-8080}"
+    volumes:
+      - ./:/app
+      - /app/tmp
+      - ./uploads:/app/uploads
+    environment:
+      - ENV=dev
+    env_file:
+      - .env
