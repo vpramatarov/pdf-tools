@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Tools</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        #loading-overlay {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease-in-out;
+        }
+        
+        #loading-overlay.htmx-request {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center relative">
+
+    <div id="loading-overlay" class="htmx-indicator fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-60 backdrop-blur-sm">
+        <div class="bg-white p-5 rounded-lg shadow-xl flex flex-col items-center">
+            <svg class="animate-spin h-10 w-10 text-blue-600 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span class="text-gray-800 font-semibold animate-pulse">Working...</span>
+            <span class="text-gray-500 text-sm mt-1">Please wait</span>
+        </div>
+    </div>
+
+    <div class="bg-white p-8 rounded shadow-md w-full max-w-md z-10">
+    <h1 class="text-2xl font-bold mb-6 text-center text-gray-800">PDF Tools</h1>
+
+    <div class="flex border-b border-gray-200 mb-6">
+        <button onclick="switchTab('compress')" id="tab-compress" class="flex-1 py-2 text-blue-600 border-b-2 border-blue-600 font-medium">Compression</button>
+        <button onclick="switchTab('word')" id="tab-word" class="flex-1 py-2 text-gray-500 hover:text-gray-700 font-medium">PDF to Word</button>
+    </div>
+
+    <div id="form-compress">
+        <form hx-post="/compress" 
+              hx-encoding="multipart/form-data" 
+              hx-target="#result" 
+              hx-indicator="#loading-overlay"
+              hx-disabled-elt="#btn-compress"
+              class="space-y-4">
+            
+            <div>
+                <label class="block mb-2 text-sm font-medium text-gray-900">Choose PDF(s)</label>
+                <input type="file" name="pdf" accept=".pdf" multiple required
+                       class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none">
+            </div>
+            
+            <div>
+                 <select name="level" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5">
+                    <option value="extreme">Extreme</option>
+                    <option value="screen">Strong (Screen - 72dpi)</option>
+                    <option value="ebook" selected>Balanced (Ebook - 150dpi)</option>
+                    <option value="printer">Weak (Printer - 300dpi)</option>
+                    </select>
+            </div>
+
+            <button id="btn-compress" type="submit" 
+                    class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">
+                Compress
+            </button>
+        </form>
+    </div>
+
+    <div id="form-word" class="hidden">
+        <form hx-post="/convert-word" 
+              hx-encoding="multipart/form-data" 
+              hx-target="#result" 
+              hx-indicator="#loading-overlay"
+              class="space-y-4">
+
+            <div class="mb-3">
+                <label for="pdf-word" class="block mb-2 text-sm font-medium text-gray-900">Choose PDF file</label>
+                <input type="file" id="pdf-word" name="pdf" required accept=".pdf"
+                class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none" >
+            </div>
+
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" name="sort" value="false" id="disableSort">
+                <label class="form-check-label" for="disableSort">
+                    <small>
+                        <strong>Disable Smart Sorting</strong> (Check this if the text order is jumbled)
+                    </small>
+                </label>
+                <div class="form-text">
+                    By default, we rearrange text to match newspaper columns. Disable this for standard linear documents.
+                </div>
+            </div>
+
+            <button type="submit" 
+                    class="w-full text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5">
+                Convert to Word
+            </button>
+        </form>
+    </div>
+
+    <div id="result" class="mt-6"></div>
+</div>
+
+<script>
+    function switchTab(tab) {
+        const compressForm = document.getElementById('form-compress');
+        const wordForm = document.getElementById('form-word');
+        const compressTab = document.getElementById('tab-compress');
+        const wordTab = document.getElementById('tab-word');
+        const resDiv = document.getElementById('result');
+
+        resDiv.innerHTML = "";
+
+        if (tab === 'compress') {
+            compressForm.classList.remove('hidden');
+            wordForm.classList.add('hidden');
+            
+            compressTab.classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
+            compressTab.classList.remove('text-gray-500');
+            
+            wordTab.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
+            wordTab.classList.add('text-gray-500');
+        } else {
+            compressForm.classList.add('hidden');
+            wordForm.classList.remove('hidden');
+            
+            wordTab.classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
+            wordTab.classList.remove('text-gray-500');
+            
+            compressTab.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
+            compressTab.classList.add('text-gray-500');
+        }
+    }
+</script>
+
+</body>
+</html>
